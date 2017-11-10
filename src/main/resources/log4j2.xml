@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
+    <RollingFile name="RollingFileError" fileName="logs/app_error.log"
+                 filePattern="logs/$${date:yyyy-MM}/app_error-%d{yyyy-MM-dd}-%i.log.gz">
+      <PatternLayout>
+        <Pattern>%d %p %c{3.} [%t] %m%n</Pattern>
+      </PatternLayout>
+      <Policies>
+        <TimeBasedTriggeringPolicy />
+        <SizeBasedTriggeringPolicy size="250 MB"/>
+      </Policies>
+      <DefaultRolloverStrategy max="20"/>
+    </RollingFile>
+    <RollingFile name="RollingFileInfo" fileName="logs/app.log"
+                 filePattern="logs/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i.log.gz">
+      <PatternLayout>
+        <Pattern>%d %p %c{3.} [%t] %m%n</Pattern>
+      </PatternLayout>
+      <Policies>
+        <TimeBasedTriggeringPolicy />
+        <SizeBasedTriggeringPolicy size="250 MB"/>
+      </Policies>
+      <DefaultRolloverStrategy max="20"/>
+    </RollingFile>
+    <RollingFile name="RollingFileAll" fileName="logs/app_ALL.log"
+                 filePattern="logs/$${date:yyyy-MM}/app_error-%d{yyyy-MM-dd}-%i.log.gz">
+      <PatternLayout>
+        <Pattern>%d %p %c{3.} [%t] %m%n</Pattern>
+      </PatternLayout>
+      <Policies>
+        <TimeBasedTriggeringPolicy />
+        <SizeBasedTriggeringPolicy size="250 MB"/>
+      </Policies>
+      <DefaultRolloverStrategy max="20"/>
+    </RollingFile>
+  </Appenders>
+  <Loggers>
+    <Logger name="org.hibernate" level="off" additivity="false">
+      <AppenderRef ref="Console"/>
+    </Logger>
+    <Logger name="com.ibh.spdesktop" level="info" additivity="false">
+      <AppenderRef ref="RollingFileInfo"/>
+    </Logger>
+    <Logger name="com.ibh.spdesktop" level="all" additivity="false">
+      <AppenderRef ref="RollingFileAll"/>
+    </Logger>
+    <Root level="error">
+      <AppenderRef ref="RollingFileError"/>
+    </Root>
+  </Loggers>
+</Configuration>

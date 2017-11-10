@@ -1,0 +1,39 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Dec 20, 2016, 2:54:13 PM
+    Author     : ihorvath
+*/
+.view {
+  -fx-background-color: #99ff99;
+}
+.categoryLabel {
+  -fx-font-size: 20;
+  -fx-font-style: italic;
+  -fx-font-weight: bold;
+  -fx-text-fill: blue;
+}
+.titleLabel {
+  -fx-font-size: 30; 
+  -fx-font-weight: bold; 
+  -fx-text-fill: brown;
+}
+.webAddressLabel {
+  -fx-font-size: 20;
+}
+.howOldLabel {
+  -fx-font-size: 25; 
+  -fx-font-weight: bold; 
+  -fx-text-fill: brown;
+}
+.viewTitle {
+  -fx-text-fill: #1820b2;
+  -fx-font-size: 14; 
+  -fx-font-weight: bold;
+  -fx-padding: 10px;
+  -fx-border-insets: 10px;
+  -fx-background-insets: 10px;
+}
