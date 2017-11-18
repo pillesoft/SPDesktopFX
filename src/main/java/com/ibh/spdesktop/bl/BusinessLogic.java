@@ -4,7 +4,6 @@ import com.ibh.spdesktop.dal.AuthenticationRepository;
 import com.ibh.spdesktop.dal.CategoryRepository;
 import com.ibh.spdesktop.dal.DbContext;
 import com.ibh.spdesktop.dal.IBHDatabaseException;
-import com.ibh.spdesktop.gui.LoginController;
 import javax.persistence.PersistenceException;
 import org.h2.jdbc.JdbcSQLException;
 import org.slf4j.Logger;

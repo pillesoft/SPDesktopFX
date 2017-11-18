@@ -183,4 +183,9 @@ public class AuthListViewController extends BaseController implements Initializa
     );
 
   }
+
+  @Override
+  public void setUpValidators() {
+    
+  }
 }
