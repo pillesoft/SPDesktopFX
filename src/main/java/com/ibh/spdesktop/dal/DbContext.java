@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.ibh.spdesktop.dal;
 
-import com.ibh.spdesktop.gui.LoginController;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,8 +7,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -46,7 +38,7 @@ public final class DbContext {
       throw new IllegalArgumentException("DbName is empty");
     }
     if (Files.exists(getDbFileName(dbName))) {
-      throw new IBHDatabaseException(IBHDatabaseException.AVAILABLE);
+      throw new IBHDatabaseException(IBHDatabaseException.DBException.AVAILABLE);
     }
 
     HashMap<String, String> sett = new HashMap<String, String>();
@@ -66,7 +58,7 @@ public final class DbContext {
       throw new IllegalArgumentException("DbName is empty");
     }
     if (!Files.exists(getDbFileName(dbName))) {
-      throw new IBHDatabaseException(IBHDatabaseException.NOTAVAILABLE);
+      throw new IBHDatabaseException(IBHDatabaseException.DBException.NOTAVAILABLE);
     }
 
     Map sett = new HashMap<String, String>();

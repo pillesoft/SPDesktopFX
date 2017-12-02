@@ -4,6 +4,10 @@ import com.ibh.spdesktop.dal.AuthenticationRepository;
 import com.ibh.spdesktop.dal.CategoryRepository;
 import com.ibh.spdesktop.dal.DbContext;
 import com.ibh.spdesktop.dal.IBHDatabaseException;
+import com.ibh.spdesktop.dal.Setting;
+import com.ibh.spdesktop.dal.SettingRepository;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.persistence.PersistenceException;
 import org.h2.jdbc.JdbcSQLException;
 import org.slf4j.Logger;
@@ -19,11 +23,13 @@ public class BusinessLogic {
   
   private final CategoryRepository categRepos;
   private final AuthenticationRepository authRepos;
+  private final SettingRepository settingRepos;
   private String loggedInName;
   
   public BusinessLogic() {
     categRepos = new CategoryRepository();
     authRepos = new AuthenticationRepository();
+    settingRepos = new SettingRepository();
   }
 
   public CategoryRepository getCategRepos() {
@@ -32,6 +38,10 @@ public class BusinessLogic {
 
   public AuthenticationRepository getAuthRepos() {
     return authRepos;
+  }
+
+  public SettingRepository getSettingRepos() {
+    return settingRepos;
   }
   
   public String getLoggedInName() {
@@ -46,7 +56,9 @@ public class BusinessLogic {
     try {
       DbContext.connect(dbName, pwd, encrpwd);
       loggedInName = dbName;
-      Crypt.setKeyByte(String.valueOf(pwd));
+      
+      Setting s = settingRepos.getSetting("DBCREATETIMESTAMP");
+      Crypt.setKeyByte(s.getValue());
       return true;
     } catch (IBHDatabaseException | PersistenceException dbe) {
       throw dbe;
@@ -62,7 +74,9 @@ public class BusinessLogic {
     try {
       DbContext.createDatabase(dbName, pwd, getEncrPwd(pwd));
       loggedInName = dbName;
-      Crypt.setKeyByte(String.valueOf(pwd));
+      Setting s = settingRepos.add(new Setting("DBCREATETIMESTAMP", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE)));
+      
+      Crypt.setKeyByte(s.getValue());
       return true;
     } catch (IBHDatabaseException dbe) {
       throw dbe;

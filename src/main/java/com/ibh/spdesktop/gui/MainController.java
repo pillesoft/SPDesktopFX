@@ -105,14 +105,7 @@ public class MainController extends BaseController implements Initializable {
   private void postLogin() {
     System.out.println("postLogin");
     isToolbarDisabled.setValue(false);
-//    setContentCenter(ViewEnum.AuthListView);
   }
-
-//  private void postCreateDB() {
-//    System.out.println("postCreateDB");
-//    isToolbarDisabled.setValue(false);
-//    setContentCenter(ViewEnum.AuthListView);
-//  }
 
   @FXML
   public void handleTlbExit() {

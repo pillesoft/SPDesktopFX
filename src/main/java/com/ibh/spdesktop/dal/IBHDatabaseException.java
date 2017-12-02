@@ -6,19 +6,32 @@ package com.ibh.spdesktop.dal;
  * @author ihorvath
  */
 public class IBHDatabaseException extends RuntimeException {
-  private final String status;
 
-  public static final String AVAILABLE = "AVAILABLE";
-  public static final String NOTAVAILABLE = "NOTAVAILABLE";
+  private final DBException type;
+  
+  public enum DBException {
+    AVAILABLE("The database is available"),
+    NOTAVAILABLE("The database is not available");
+    
+    private String description;
 
-  public String getStatus() {
-    return status;
+    DBException(String description) {
+      this.description = description;
+    }
+
+    public String getDescription() {
+      return description;
+    }
+    
   }
   
-  public IBHDatabaseException(String status) {
+  public IBHDatabaseException(DBException type) {
     super();
-    this.status = status;
+    this.type = type;
   }
-  
+
+  public DBException getType() {
+    return type;
+  }
   
 }

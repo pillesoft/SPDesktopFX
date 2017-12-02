@@ -5,7 +5,6 @@ import com.ibh.spdesktop.dal.IBHDatabaseException;
 import com.ibh.spdesktop.message.ActionMessage;
 import com.ibh.spdesktop.message.MessageService;
 import com.ibh.spdesktop.validation.ValidationException;
-import com.ibh.spdesktop.viewmodel.BaseViewModel;
 import com.ibh.spdesktop.viewmodel.LoginVM;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -49,9 +48,7 @@ public class LoginController extends BaseController<LoginVM> implements Initiali
       getBl().login(txtUserName.getText(), txtPassword.getText().toCharArray());
       MessageService.send(ActionMessage.class, new ActionMessage(ViewEnum.AuthListView));
     } catch (IBHDatabaseException dexc) {
-      if (dexc.getStatus().equals(IBHDatabaseException.NOTAVAILABLE)) {
-        lblErrorText.setText("Database is not available");
-      }
+      lblErrorText.setText(dexc.getType().getDescription());
     } catch (ValidationException exc) {
       setControlStateError(exc);
     } catch (Exception exc) {
@@ -61,28 +58,24 @@ public class LoginController extends BaseController<LoginVM> implements Initiali
 
   @FXML
   private void handleCreateDB() {
+    setControlStateNormal();
     lblErrorText.setText("");
 
     LOG.debug("handleCreateDB");
 
-//    if (!validationSupport.isInvalid()) {
     try {
+      vm.validateModel();
+
       getBl().createDB(txtUserName.getText(), txtPassword.getText().toCharArray());
       getBl().login(txtUserName.getText(), txtPassword.getText().toCharArray());
       MessageService.send(ActionMessage.class, new ActionMessage(ViewEnum.AuthListView));
+    } catch (ValidationException exc) {
+      setControlStateError(exc);
     } catch (IBHDatabaseException dexc) {
-      if (dexc.getStatus().equals(IBHDatabaseException.NOTAVAILABLE)) {
-        lblErrorText.setText("Database is not available");
-      } else if (dexc.getStatus().equals(IBHDatabaseException.AVAILABLE)) {
-        lblErrorText.setText("That database is available already");
-      }
+      lblErrorText.setText(dexc.getType().getDescription());
     } catch (Exception exc) {
       lblErrorText.setText("Wrong User name / Password");
     }
-//
-//    } else {
-//      validationSupport.redecorate();
-//    }
   }
 
   /**

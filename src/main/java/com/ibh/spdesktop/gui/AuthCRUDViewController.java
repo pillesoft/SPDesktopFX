@@ -6,6 +6,7 @@ import com.ibh.spdesktop.message.ActionMessage;
 import com.ibh.spdesktop.message.AuthCrudMessage;
 import com.ibh.spdesktop.message.BaseMessage;
 import com.ibh.spdesktop.message.MessageService;
+import com.ibh.spdesktop.viewmodel.AuthenticationVM;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -16,7 +17,7 @@ import javafx.fxml.Initializable;
  *
  * @author ihorvath
  */
-public class AuthCRUDViewController extends BaseController implements Initializable {
+public class AuthCRUDViewController extends BaseController<AuthenticationVM> implements Initializable {
 
   private Authentication instance;
   

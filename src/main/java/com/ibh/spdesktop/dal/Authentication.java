@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.ibh.spdesktop.dal;
 
 import com.ibh.spdesktop.bl.Crypt;
@@ -11,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.CascadeType;
@@ -84,7 +79,7 @@ public class Authentication implements Serializable {
 
   @Column(name = "VALIDFROM")
   @Temporal(TemporalType.DATE)
-  private Date validfrom;
+  private LocalDate validfrom;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
 //  @JoinColumn(name = "CATEGORY_ID", nullable = false, referencedColumnName = "ID", foreignKey = @ForeignKey(name = "CATEGORY_ID_FK"))
@@ -249,12 +244,12 @@ public class Authentication implements Serializable {
 //    changeSupport.firePropertyChange("description", old, description);
   }
 
-  public Date getValidfrom() {
+  public LocalDate getValidfrom() {
     return validfrom;
   }
 
-  public void setValidfrom(Date validfrom) {
-    Date old = this.validfrom;
+  public void setValidfrom(LocalDate validfrom) {
+    LocalDate old = this.validfrom;
     this.validfrom = validfrom;
 //    Set<ConstraintViolation<Authentication>> err = validator.validateProperty(this, "validfrom");
 //    if (err.size() > 0) {

@@ -17,7 +17,7 @@ public class LoginVM extends BaseViewModel<LoginVM> {
   @NotEmpty(message = "User Name is obligatory")
   @Size(min=5, message = "Too short. Minimum length is 5 characters")
   private StringProperty userName;
-  @NotEmpty(message = "Passwordis obligatory")
+  @NotEmpty(message = "Password is obligatory")
   @Size(min=6, message = "Too short. Minimum length is 6 characters")
   private StringProperty password;
 

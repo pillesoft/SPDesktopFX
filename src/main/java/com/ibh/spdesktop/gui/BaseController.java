@@ -70,11 +70,10 @@ public abstract class BaseController<T extends BaseViewModel> implements IContro
   protected void setControlStateNormal() {
     BorderStroke bs = new BorderStroke(Paint.valueOf("GREY"), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT);
     Border b = new Border(bs);
-    Tooltip tt = new Tooltip("");
 
     validatedControls.forEach((k, v) -> {
       v.borderProperty().set(b);
-      v.tooltipProperty().set(tt);
+      v.tooltipProperty().set(null);
     });
   }
 
