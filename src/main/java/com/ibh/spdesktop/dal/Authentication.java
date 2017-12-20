@@ -24,8 +24,6 @@ import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +76,6 @@ public class Authentication implements Serializable {
   private String description;
 
   @Column(name = "VALIDFROM")
-  @Temporal(TemporalType.DATE)
   private LocalDate validfrom;
 
   @ManyToOne(cascade = CascadeType.PERSIST)

@@ -41,12 +41,13 @@ public class Category implements Serializable {
 
   public Category(String name) {
     this.name = name;
-    this.color = "128,128,128,255";
+    this.color = "0xffffffff";
   }
 
-  public Category(String name, int red, int green, int blue, int alpha) {
+  public Category(Integer id, String name, String hexcolor) {
+    this.id = id;
     this.name = name;
-    this.color = String.format("%s,%s,%s,%s", red, green, blue, alpha);
+    this.color = hexcolor;
   }
 
   public Integer getId() {

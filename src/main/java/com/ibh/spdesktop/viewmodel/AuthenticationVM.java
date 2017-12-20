@@ -20,6 +20,10 @@ public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
   private StringProperty title;
 
   @NotNull
+  @Size(min = 3)
+  private StringProperty category;
+
+  @NotNull
   @Size(min = 4, max = 100)
   private StringProperty userName;
 
@@ -36,6 +40,7 @@ public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
 
   public AuthenticationVM() {
     title = new SimpleStringProperty(null, "title", "");
+    category = new SimpleStringProperty(null, "category");
     userName = new SimpleStringProperty(null, "userName", "");
     password = new SimpleStringProperty(null, "password", "");
     webUrl = new SimpleStringProperty(null, "webUrl", "");
@@ -45,7 +50,7 @@ public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
 
   @Override
   public void validateModel() throws ValidationException {
-    super.validate();    
+    super.validate();
   }
 
   public StringProperty getTitle() {
@@ -54,6 +59,14 @@ public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
 
   public void setTitle(StringProperty title) {
     this.title = title;
+  }
+
+  public StringProperty getCategory() {
+    return category;
+  }
+
+  public void setCategory(StringProperty category) {
+    this.category = category;
   }
 
   public StringProperty getUserName() {
@@ -96,5 +109,4 @@ public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
     this.validFrom = validFrom;
   }
 
-  
 }

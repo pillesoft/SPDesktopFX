@@ -42,6 +42,7 @@ public class SPDesktop extends Application {
     Parent root = loader.load();
 
     Scene scene = new Scene(root);
+    scene.getStylesheets().add(this.getClass().getResource("/styles/Application.css").toString());
 
     // Add a custom icon.
     primaryStage.getIcons().add(new Image(this.getClass().getResource("/image/Safe-icon.png").toString()));

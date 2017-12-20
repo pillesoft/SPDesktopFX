@@ -42,43 +42,43 @@ public class MainController extends BaseController implements Initializable {
   public void initialize(URL url, ResourceBundle rb) {
 
     setBundle(rb);
-    
+
     isToolbarDisabled = new SimpleBooleanProperty(true);
     toolbar.disableProperty().bind(isToolbarDisabled);
 
     MessageService.register(ActionMessage.class, (arg) -> {
-      ActionMessage actmess = (ActionMessage)arg;
-      switch(actmess.getContent()) {
+      ActionMessage actmess = (ActionMessage) arg;
+      switch (actmess.getContent()) {
         case AuthListView:
           postLogin();
           break;
         default:
           break;
       }
-      
+
       setContentCenter(actmess.getContent(), actmess);
-      
+
     });
 
     MessageService.register(AuthCrudMessage.class, (arg) -> {
-      AuthCrudMessage actmess = (AuthCrudMessage)arg;
+      AuthCrudMessage actmess = (AuthCrudMessage) arg;
       setContentCenter(actmess.getContent(), actmess);
-      
+
     });
-    
+
     setContentCenter(ViewEnum.Login, null);
-    
+
   }
 
   private void setContentCenter(ViewEnum uitype, BaseMessage msg) {
     //borderPane.centerProperty().setValue(null);
-    
+
     Node node;
     try {
       View v = ViewFactory.getViews().get(uitype);
 
       FXMLLoader loader = new FXMLLoader(getClass().getResource(v.getFxmlPath()), getBundle());
-      BaseController controller = (BaseController)v.getController().getDeclaredConstructor(BusinessLogic.class).newInstance(getBl());
+      BaseController controller = (BaseController) v.getController().getDeclaredConstructor(BusinessLogic.class).newInstance(getBl());
       controller.setMessage(msg);
       loader.setController(controller);
       node = loader.load();
@@ -101,7 +101,7 @@ public class MainController extends BaseController implements Initializable {
       Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
-  
+
   private void postLogin() {
     System.out.println("postLogin");
     isToolbarDisabled.setValue(false);
@@ -119,9 +119,9 @@ public class MainController extends BaseController implements Initializable {
 
   @FXML
   public void handleTlbCateg() {
-
+    setContentCenter(ViewEnum.CategoryListView, null);
   }
-  
+
   @FXML
   public void handleTlbAbout() {
 
@@ -129,7 +129,7 @@ public class MainController extends BaseController implements Initializable {
 
   @Override
   public void setUpValidators() {
-    
+
   }
-  
+
 }

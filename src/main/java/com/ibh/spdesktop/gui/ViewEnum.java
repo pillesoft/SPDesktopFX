@@ -13,8 +13,9 @@ public enum ViewEnum {
   Main,
   Login,
   AuthListView,
-  CategoryView,
+  CategoryListView,
   AuthView,
-  AuthCRUDView
+  AuthCRUDView,
+  CategoryCRUDView
   
 }

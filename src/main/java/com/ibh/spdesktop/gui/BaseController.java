@@ -8,8 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.beans.property.Property;
+import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Control;
-import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
@@ -17,12 +18,16 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Paint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author ihorvath
  */
 public abstract class BaseController<T extends BaseViewModel> implements IController {
+
+  private static final Logger LOG = LoggerFactory.getLogger(BaseController.class);
 
   private final BusinessLogic bl;
   private ResourceBundle bundle;
@@ -46,23 +51,32 @@ public abstract class BaseController<T extends BaseViewModel> implements IContro
     this.message = message;
   }
 
+  protected BaseMessage getMessage() {
+    return message;
+  }
+
 //  public void setInstance(T instance) {
 //    this.instance = instance;
 //  }
-
   public BaseController(BusinessLogic bl) {
     this.bl = bl;
     validatedControls = new HashMap<>();
   }
-  
+
   protected void setUpValidator(Control ctrl, Property field) throws Exception {
 
-    if (ctrl instanceof TextField) {
-      TextField ctrltxt = (TextField) ctrl;
+    if (ctrl instanceof TextInputControl) {
+      TextInputControl ctrltxt = (TextInputControl) ctrl;
       ctrltxt.textProperty().bindBidirectional(field);
+      ctrltxt.setText(String.valueOf(field.getValue()));
       validatedControls.put(field.getName(), ctrltxt);
+    } else if (ctrl instanceof ComboBoxBase) {
+      ComboBoxBase ctrlcmb = (ComboBoxBase) ctrl;
+      ctrlcmb.valueProperty().bindBidirectional(field);
+      ctrlcmb.setValue(field.getValue());
+      validatedControls.put(field.getName(), ctrlcmb);
     } else {
-      throw new Exception("not defined control");
+      throw new Exception("not defined control - " + field.getName());
     }
 
   }
@@ -84,11 +98,14 @@ public abstract class BaseController<T extends BaseViewModel> implements IContro
 
     valexc.getValidationError().forEach((field, errs) -> {
       Control ctrl = validatedControls.get(field);
-      ctrl.borderProperty().set(b);
+      if (ctrl == null) {
+        LOG.warn("there is no control for field: {}", field);
+      } else {
+        ctrl.borderProperty().set(b);
 
-      Tooltip tt = new Tooltip(String.join("\n", errs));
-      ctrl.tooltipProperty().set(tt);
-
+        Tooltip tt = new Tooltip(String.join("\n", errs));
+        ctrl.tooltipProperty().set(tt);
+      }
     });
 
   }

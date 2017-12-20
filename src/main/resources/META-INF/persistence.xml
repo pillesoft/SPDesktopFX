@@ -10,6 +10,9 @@
     <properties>
       <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
       <property name="eclipselink.logging.level" value="ALL"/>
+      <property name="javax.persistence.jdbc.url" value="c:\TEMP\SP\IvanTest"/>
+      <property name="javax.persistence.jdbc.user" value="IvanTest" />
+      <property name="javax.persistence.jdbc.password" value="ivantest" />
     </properties>
   </persistence-unit>
 </persistence>
