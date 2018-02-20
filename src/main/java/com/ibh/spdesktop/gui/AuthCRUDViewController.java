@@ -3,7 +3,7 @@ package com.ibh.spdesktop.gui;
 import com.ibh.spdesktop.bl.BusinessLogic;
 import com.ibh.spdesktop.dal.Authentication;
 import com.ibh.spdesktop.message.ActionMessage;
-import com.ibh.spdesktop.message.AuthCrudMessage;
+import com.ibh.spdesktop.message.CrudMessage;
 import com.ibh.spdesktop.message.BaseMessage;
 import com.ibh.spdesktop.message.MessageService;
 import com.ibh.spdesktop.validation.ValidationException;
@@ -94,16 +94,16 @@ public class AuthCRUDViewController extends BaseController<AuthenticationVM> imp
     super.setMessage(message);
 
     // the message type is AuthCrudMessage
-    AuthCrudMessage msg = (AuthCrudMessage) message;
+    CrudMessage msg = (CrudMessage) message;
     switch (msg.getCrud()) {
       case New:
         setInstance(new Authentication());
         break;
       case Update:
-        setInstance(getBl().getAuthRepos().getById(msg.getAuthID()));
+        setInstance(getBl().getAuthRepos().getById(msg.getId()));
         break;
       case Delete:
-        setInstance(getBl().getAuthRepos().getById(msg.getAuthID()));
+        setInstance(getBl().getAuthRepos().getById(msg.getId()));
         break;
       default:
         break;

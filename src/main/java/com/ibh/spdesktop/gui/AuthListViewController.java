@@ -7,7 +7,7 @@ package com.ibh.spdesktop.gui;
 
 import com.ibh.spdesktop.bl.BusinessLogic;
 import com.ibh.spdesktop.dal.AuthLimited;
-import com.ibh.spdesktop.message.AuthCrudMessage;
+import com.ibh.spdesktop.message.CrudMessage;
 import com.ibh.spdesktop.message.MessageService;
 import java.io.IOException;
 import java.net.URL;
@@ -120,17 +120,17 @@ public class AuthListViewController extends BaseController implements Initializa
 
   @FXML
   public void handleNew() {
-    MessageService.send(AuthCrudMessage.class, new AuthCrudMessage(ViewEnum.AuthCRUDView, 0, CRUDEnum.New));
+    MessageService.send(CrudMessage.class, new CrudMessage(ViewEnum.AuthCRUDView, 0, CRUDEnum.New));
   }
 
   @FXML
   public void handleEdit() {
-    MessageService.send(AuthCrudMessage.class, new AuthCrudMessage(ViewEnum.AuthCRUDView, currentData.getId(), CRUDEnum.Update));
+    MessageService.send(CrudMessage.class, new CrudMessage(ViewEnum.AuthCRUDView, currentData.getId(), CRUDEnum.Update));
   }
 
   @FXML
   public void handleDelete() {
-    MessageService.send(AuthCrudMessage.class, new AuthCrudMessage(ViewEnum.AuthCRUDView, currentData.getId(), CRUDEnum.Delete));
+    MessageService.send(CrudMessage.class, new CrudMessage(ViewEnum.AuthCRUDView, currentData.getId(), CRUDEnum.Delete));
   }
 
   @FXML

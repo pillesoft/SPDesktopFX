@@ -8,7 +8,7 @@ package com.ibh.spdesktop.gui;
 import com.google.common.collect.ImmutableList;
 import com.ibh.spdesktop.bl.BusinessLogic;
 import com.ibh.spdesktop.dal.Category;
-import com.ibh.spdesktop.message.AuthCrudMessage;
+import com.ibh.spdesktop.message.CrudMessage;
 import com.ibh.spdesktop.message.MessageService;
 import com.ibh.spdesktop.viewmodel.CategoryVM;
 import java.net.URL;
@@ -22,9 +22,14 @@ import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Callback;
 
 /**
  * FXML Controller class
@@ -33,89 +38,119 @@ import javafx.scene.shape.Rectangle;
  */
 public class CategoryListViewController extends BaseController implements Initializable {
 
-  @FXML
-  private TableView<CategoryVM> categoryTable;
-  @FXML
-  private TableColumn<CategoryVM, String> nameColumn;
-  @FXML
-  private TableColumn<CategoryVM, String> colorColumn;
+	@FXML
+	private TableView<CategoryVM> categoryTable;
+	@FXML
+	private TableColumn<CategoryVM, String> nameColumn;
+	@FXML
+	private TableColumn<CategoryVM, String> colorColumn;
 
-  @FXML
-  private Label nameLabel;
-  @FXML
-  private Rectangle colorRectangle;
+	@FXML
+	private ListView<CategoryVM> categoryList;
 
-  private ObservableList<CategoryVM> data;
-  private FilteredList<CategoryVM> filteredData;
-  private CategoryVM currentData = null;
+	@FXML
+	private Label nameLabel;
+	@FXML
+	private Rectangle colorRectangle;
 
-  public CategoryListViewController(BusinessLogic bl) {
-    super(bl);
-  }
+	private ObservableList<CategoryVM> data;
+	private FilteredList<CategoryVM> filteredData;
+	private CategoryVM currentData = null;
 
-  /**
-   * Initializes the controller class.
-   */
-  @Override
-  public void initialize(URL url, ResourceBundle rb) {
+	public CategoryListViewController(BusinessLogic bl) {
+		super(bl);
+	}
 
-    List<CategoryVM> cvmlist = new ArrayList();
-    getBl().getCategRepos().getList().forEach(c -> cvmlist.add(from(c)));
+	/**
+	 * Initializes the controller class.
+	 */
+	@Override
+	public void initialize(URL url, ResourceBundle rb) {
 
-    data = FXCollections.observableList(cvmlist);
+		List<CategoryVM> cvmlist = new ArrayList();
+		getBl().getCategRepos().getList().forEach(c -> cvmlist.add(from(c)));
 
-    nameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());
-    colorColumn.setCellValueFactory(cellData -> cellData.getValue().getColor());
+		data = FXCollections.observableArrayList(cvmlist);
 
-    categoryTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldvalue, newvalue) -> {
-      currentData = newvalue;
-      showDetails();
-    }));
+		nameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());
+		colorColumn.setCellValueFactory(cellData -> cellData.getValue().getColor());
 
-    filteredData = new FilteredList<>(data, p -> true);
+		categoryTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldvalue, newvalue) -> {
+			currentData = newvalue;
+			showDetails();
+		}));
 
-    SortedList<CategoryVM> sortedData = new SortedList<>(filteredData);
-    sortedData.comparatorProperty().bind(categoryTable.comparatorProperty());
+		filteredData = new FilteredList<>(data, p -> true);
 
-    categoryTable.setItems(sortedData);
-    if (!sortedData.isEmpty()) {
-      currentData = sortedData.get(0);
-    }
+		SortedList<CategoryVM> sortedData = new SortedList<>(filteredData);
+		sortedData.comparatorProperty().bind(categoryTable.comparatorProperty());
 
-    showDetails();
+		categoryTable.setItems(sortedData);
+		if (!sortedData.isEmpty()) {
+			currentData = sortedData.get(0);
+		}
 
-  }
+		categoryList.setItems(data);
+		categoryList.setCellFactory(new Callback<ListView<CategoryVM>, ListCell<CategoryVM>>() {
+			@Override
+			public ListCell<CategoryVM> call(ListView<CategoryVM> list) {
+				return new ColorRectCell();
+			}
+		});
 
-  private CategoryVM from(Category c) {
-    return new CategoryVM(c.getId(), c.getName(), c.getColor());
-  }
+		showDetails();
 
-  private void showDetails() {
-    if (currentData != null) {
-      nameLabel.setText(currentData.getName().getValue());
-      colorRectangle.setFill(currentData.getRGBColor());
-    } else {
-      nameLabel.setText("");
-    }
-  }
+	}
 
-  @FXML
-  public void handleNew() {
-    MessageService.send(AuthCrudMessage.class, new AuthCrudMessage(ViewEnum.CategoryCRUDView, 0, CRUDEnum.New));
-  }
+	static class ColorRectCell extends ListCell<CategoryVM> {
+		@Override
+		public void updateItem(CategoryVM item, boolean empty) {
+			super.updateItem(item, empty);
+			if (item != null) {
+				HBox box = new HBox();
+				Rectangle rect = new Rectangle(100, 20);
+				rect.setFill(item.getRGBColor());
+				box.getChildren().add(rect);
+				Label l = new Label();
+				l.setText(item.getName().get());
+				box.getChildren().add(l);
+				setGraphic(box);
+			}
+		}
+	}
 
-  @FXML
-  public void handleEdit() {
-    MessageService.send(AuthCrudMessage.class, new AuthCrudMessage(ViewEnum.CategoryCRUDView, currentData.getId().get(), CRUDEnum.Update));
-  }
+	private CategoryVM from(Category c) {
+		return new CategoryVM(c.getId(), c.getName(), c.getColor());
+	}
 
-  @FXML
-  public void handleDelete() {
-    MessageService.send(AuthCrudMessage.class, new AuthCrudMessage(ViewEnum.CategoryCRUDView, currentData.getId().get(), CRUDEnum.Delete));
-  }
+	private void showDetails() {
+		if (currentData != null) {
+			nameLabel.setText(currentData.getName().getValue());
+			colorRectangle.setFill(currentData.getRGBColor());
+		} else {
+			nameLabel.setText("");
+		}
+	}
 
-  @Override
-  public void setUpValidators() {
+	@FXML
+	public void handleNew() {
+		MessageService.send(CrudMessage.class, new CrudMessage(ViewEnum.CategoryCRUDView, 0, CRUDEnum.New));
+	}
 
-  }
+	@FXML
+	public void handleEdit() {
+		MessageService.send(CrudMessage.class,
+				new CrudMessage(ViewEnum.CategoryCRUDView, currentData.getId().get(), CRUDEnum.Update));
+	}
+
+	@FXML
+	public void handleDelete() {
+		MessageService.send(CrudMessage.class,
+				new CrudMessage(ViewEnum.CategoryCRUDView, currentData.getId().get(), CRUDEnum.Delete));
+	}
+
+	@Override
+	public void setUpValidators() {
+
+	}
 }

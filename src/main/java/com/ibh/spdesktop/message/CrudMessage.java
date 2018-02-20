@@ -12,18 +12,18 @@ import com.ibh.spdesktop.gui.ViewEnum;
  *
  * @author ihorvath
  */
-public class AuthCrudMessage extends BaseMessage {
-  private final int authID;
+public class CrudMessage extends BaseMessage {
+  private final int id;
   private final CRUDEnum crud;
   
-  public AuthCrudMessage(ViewEnum content, int id, CRUDEnum crud) {
+  public CrudMessage(ViewEnum content, int id, CRUDEnum crud) {
     super(content);
-    this.authID = id;
+    this.id = id;
     this.crud = crud;
   }
 
-  public int getAuthID() {
-    return authID;
+  public int getId() {
+    return id;
   }
 
   public CRUDEnum getCrud() {

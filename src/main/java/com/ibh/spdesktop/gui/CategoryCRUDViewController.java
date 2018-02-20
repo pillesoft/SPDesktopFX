@@ -3,7 +3,7 @@ package com.ibh.spdesktop.gui;
 import com.ibh.spdesktop.bl.BusinessLogic;
 import com.ibh.spdesktop.dal.Category;
 import com.ibh.spdesktop.message.ActionMessage;
-import com.ibh.spdesktop.message.AuthCrudMessage;
+import com.ibh.spdesktop.message.CrudMessage;
 import com.ibh.spdesktop.message.BaseMessage;
 import com.ibh.spdesktop.message.MessageService;
 import com.ibh.spdesktop.validation.ValidationException;
@@ -42,12 +42,14 @@ public class CategoryCRUDViewController extends BaseController<CategoryVM> imple
     try {
       vm.validateModel();
 
-      AuthCrudMessage msg = (AuthCrudMessage) getMessage();
+      CrudMessage msg = (CrudMessage) getMessage();
       switch (msg.getCrud()) {
         case New:
           instance = fromVMToEntity();
           getBl().getCategRepos().add(instance);
         case Update:
+        	instance = fromVMToEntity();
+        	getBl().getCategRepos().update(instance);
           break;
         case Delete:
           break;
@@ -84,8 +86,8 @@ public class CategoryCRUDViewController extends BaseController<CategoryVM> imple
   protected void setMessage(BaseMessage message) {
     super.setMessage(message);
 
-    // the message type is AuthCrudMessage
-    AuthCrudMessage msg = (AuthCrudMessage) message;
+    // the message type is CrudMessage
+    CrudMessage msg = (CrudMessage) message;
     switch (msg.getCrud()) {
       case New:
 //        setInstance(new Authentication());
@@ -93,6 +95,7 @@ public class CategoryCRUDViewController extends BaseController<CategoryVM> imple
 
         break;
       case Update:
+    	  vm = fromEntityToVM(getBl().getCategRepos().getById(msg.getId()));
 //        setInstance(getBl().getAuthRepos().getById(msg.getAuthID()));
         break;
       case Delete:
@@ -117,6 +120,8 @@ public class CategoryCRUDViewController extends BaseController<CategoryVM> imple
     try {
       setUpValidator(txtName, vm.getName());
 
+      cpColor.setValue(vm.getRGBColor());
+      
       setControlStateNormal();
     } catch (Exception ex) {
       LOG.error(ex.getMessage(), ex);

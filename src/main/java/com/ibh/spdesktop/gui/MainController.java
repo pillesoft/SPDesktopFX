@@ -2,7 +2,7 @@ package com.ibh.spdesktop.gui;
 
 import com.ibh.spdesktop.bl.BusinessLogic;
 import com.ibh.spdesktop.message.ActionMessage;
-import com.ibh.spdesktop.message.AuthCrudMessage;
+import com.ibh.spdesktop.message.CrudMessage;
 import com.ibh.spdesktop.message.BaseMessage;
 import com.ibh.spdesktop.message.MessageService;
 import java.io.IOException;
@@ -60,8 +60,8 @@ public class MainController extends BaseController implements Initializable {
 
     });
 
-    MessageService.register(AuthCrudMessage.class, (arg) -> {
-      AuthCrudMessage actmess = (AuthCrudMessage) arg;
+    MessageService.register(CrudMessage.class, (arg) -> {
+      CrudMessage actmess = (CrudMessage) arg;
       setContentCenter(actmess.getContent(), actmess);
 
     });
