@@ -4,10 +4,15 @@ import com.ibh.spdesktop.bl.BusinessLogic;
 import com.ibh.spdesktop.message.BaseMessage;
 import com.ibh.spdesktop.validation.ValidationException;
 import com.ibh.spdesktop.viewmodel.BaseViewModel;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.beans.property.Property;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextInputControl;
@@ -17,6 +22,7 @@ import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Paint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +114,38 @@ public abstract class BaseController<T extends BaseViewModel> implements IContro
       }
     });
 
+  }
+  
+  protected void setUIContent(Pane container, BaseMessage msg) {
+	    Node node;
+	    try {
+	      View v = ViewFactory.getViews().get(msg.getContent());
+
+	      FXMLLoader loader = new FXMLLoader(getClass().getResource(v.getFxmlPath()), getBundle());
+	      BaseController<T> controller = (BaseController<T>) v.getController().getDeclaredConstructor(BusinessLogic.class).newInstance(getBl());
+	      loader.setController(controller);
+	      controller.setMessage(msg);
+
+	      node = loader.load();
+	      
+	      container.getChildren().clear();
+	      container.getChildren().add(node);
+
+	    } catch (IOException ex) {
+	    	LOG.warn(null, ex);
+	    } catch (NoSuchMethodException ex) {
+	    	LOG.warn(null, ex);
+	    } catch (SecurityException ex) {
+	    	LOG.warn(null, ex);
+	    } catch (InstantiationException ex) {
+	    	LOG.warn(null, ex);
+	    } catch (IllegalAccessException ex) {
+	    	LOG.warn(null, ex);
+	    } catch (IllegalArgumentException ex) {
+	    	LOG.warn(null, ex);
+	    } catch (InvocationTargetException ex) {
+	    	LOG.warn(null, ex);
+	    }
   }
 
 }

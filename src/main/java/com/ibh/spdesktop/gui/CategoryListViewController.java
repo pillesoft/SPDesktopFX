@@ -5,53 +5,42 @@
  */
 package com.ibh.spdesktop.gui;
 
-import com.google.common.collect.ImmutableList;
 import com.ibh.spdesktop.bl.BusinessLogic;
 import com.ibh.spdesktop.dal.Category;
 import com.ibh.spdesktop.message.CrudMessage;
 import com.ibh.spdesktop.message.MessageService;
+import com.ibh.spdesktop.message.RefreshDataMessage;
 import com.ibh.spdesktop.viewmodel.CategoryVM;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.util.Callback;
+import javafx.scene.layout.VBox;
 
 /**
  * FXML Controller class
  *
  * @author ihorvath
  */
-public class CategoryListViewController extends BaseController implements Initializable {
+public class CategoryListViewController extends BaseController<CategoryVM> implements Initializable {
 
 	@FXML
 	private TableView<CategoryVM> categoryTable;
 	@FXML
 	private TableColumn<CategoryVM, String> nameColumn;
-	@FXML
-	private TableColumn<CategoryVM, String> colorColumn;
 
 	@FXML
-	private ListView<CategoryVM> categoryList;
-
-	@FXML
-	private Label nameLabel;
-	@FXML
-	private Rectangle colorRectangle;
+	private VBox crudContainer;
 
 	private ObservableList<CategoryVM> data;
 	private FilteredList<CategoryVM> filteredData;
@@ -67,18 +56,38 @@ public class CategoryListViewController extends BaseController implements Initia
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 
-		List<CategoryVM> cvmlist = new ArrayList();
-		getBl().getCategRepos().getList().forEach(c -> cvmlist.add(from(c)));
-
-		data = FXCollections.observableArrayList(cvmlist);
+		MessageService.register(RefreshDataMessage.class, (arg) -> {
+			reloadData();
+		});
 
 		nameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());
-		colorColumn.setCellValueFactory(cellData -> cellData.getValue().getColor());
 
 		categoryTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldvalue, newvalue) -> {
 			currentData = newvalue;
 			showDetails();
 		}));
+
+		categoryTable.setRowFactory(tv -> new TableRow<CategoryVM>() {
+			@Override
+			public void updateItem(CategoryVM item, boolean empty) {
+				super.updateItem(item, empty);
+				if (item == null) {
+					setStyle("");
+				} else {
+					setStyle(String.format("-fx-background-color: %s;", item.getCSSColor()));
+				}
+			}
+		});
+
+		reloadData();
+
+	}
+
+	private void reloadData() {
+		List<CategoryVM> cvmlist = new ArrayList<>();
+		getBl().getCategRepos().getList().forEach(c -> cvmlist.add(from(c)));
+
+		data = FXCollections.observableArrayList(cvmlist);
 
 		filteredData = new FilteredList<>(data, p -> true);
 
@@ -90,33 +99,8 @@ public class CategoryListViewController extends BaseController implements Initia
 			currentData = sortedData.get(0);
 		}
 
-		categoryList.setItems(data);
-		categoryList.setCellFactory(new Callback<ListView<CategoryVM>, ListCell<CategoryVM>>() {
-			@Override
-			public ListCell<CategoryVM> call(ListView<CategoryVM> list) {
-				return new ColorRectCell();
-			}
-		});
-
 		showDetails();
 
-	}
-
-	static class ColorRectCell extends ListCell<CategoryVM> {
-		@Override
-		public void updateItem(CategoryVM item, boolean empty) {
-			super.updateItem(item, empty);
-			if (item != null) {
-				HBox box = new HBox();
-				Rectangle rect = new Rectangle(100, 20);
-				rect.setFill(item.getRGBColor());
-				box.getChildren().add(rect);
-				Label l = new Label();
-				l.setText(item.getName().get());
-				box.getChildren().add(l);
-				setGraphic(box);
-			}
-		}
 	}
 
 	private CategoryVM from(Category c) {
@@ -125,27 +109,20 @@ public class CategoryListViewController extends BaseController implements Initia
 
 	private void showDetails() {
 		if (currentData != null) {
-			nameLabel.setText(currentData.getName().getValue());
-			colorRectangle.setFill(currentData.getRGBColor());
-		} else {
-			nameLabel.setText("");
+			setUIContent(crudContainer,
+					new CrudMessage(ViewEnum.CategoryCRUDView, currentData.getId().get(), CRUDEnum.View));
 		}
 	}
 
 	@FXML
 	public void handleNew() {
-		MessageService.send(CrudMessage.class, new CrudMessage(ViewEnum.CategoryCRUDView, 0, CRUDEnum.New));
-	}
-
-	@FXML
-	public void handleEdit() {
-		MessageService.send(CrudMessage.class,
-				new CrudMessage(ViewEnum.CategoryCRUDView, currentData.getId().get(), CRUDEnum.Update));
+		setUIContent(crudContainer,
+				new CrudMessage(ViewEnum.CategoryCRUDView, currentData.getId().get(), CRUDEnum.New));
 	}
 
 	@FXML
 	public void handleDelete() {
-		MessageService.send(CrudMessage.class,
+		setUIContent(crudContainer,
 				new CrudMessage(ViewEnum.CategoryCRUDView, currentData.getId().get(), CRUDEnum.Delete));
 	}
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data-sources>
+	<data-source id="h2_embedded-1620e74fb36-438d491b9c82c7c6" provider="generic" driver="h2_embedded" name="H2 - Test - Ivanka.mv.db" save-password="true" show-system-objects="true" read-only="false">
+		<connection server="" database="c:\Temp\SP\Ivanka" url="jdbc:h2:c:\Temp\SP\Ivanka" user="Ivanka" password="QlZVdBQVJPc=" type="dev"/>
+	</data-source>
+	<filters/>
+</data-sources>

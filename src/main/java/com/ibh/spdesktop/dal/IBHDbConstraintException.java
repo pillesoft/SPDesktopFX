@@ -10,7 +10,11 @@ package com.ibh.spdesktop.dal;
  * @author ihorvath
  */
 public class IBHDbConstraintException extends RuntimeException {
-  private final String constraintName;
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+private final String constraintName;
   private final String tableName;
   private final String fieldName;
 

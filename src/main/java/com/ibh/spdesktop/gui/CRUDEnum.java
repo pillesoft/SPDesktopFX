@@ -10,7 +10,5 @@ package com.ibh.spdesktop.gui;
  * @author ihorvath
  */
 public enum CRUDEnum {
-  New,
-  Update,
-  Delete
+	View, New, Update, Delete, Refresh
 }

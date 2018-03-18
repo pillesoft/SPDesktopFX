@@ -1,8 +1,9 @@
 package com.ibh.spdesktop.viewmodel;
 
-import com.ibh.spdesktop.dal.Category;
-import com.ibh.spdesktop.validation.ValidationException;
 import java.time.LocalDate;
+import java.time.Period;
+
+import com.ibh.spdesktop.validation.ValidationException;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -10,61 +11,41 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
  *
  * @author ihorvath
  */
-public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
+public class AuthLimitedVM extends BaseViewModel<AuthLimitedVM> {
 
 	private IntegerProperty id;
-	
-	@NotNull
-	@Size(min = 5, max = 100)
 	private StringProperty title;
-
-	@NotNull
-	@Size(min = 3)
 	private StringProperty category;
-
-	@NotNull
-	@Size(min = 4, max = 100)
-	private StringProperty userName;
-
-	@Size(max = 100)
-	private StringProperty password;
-
-	@Size(max = 200)
 	private StringProperty webUrl;
-
-	@Size(max = 500)
 	private StringProperty description;
-
 	private ObjectProperty<LocalDate> validFrom;
+	private StringProperty color;
 
-	public AuthenticationVM() {
-		id = new SimpleIntegerProperty(null, "id", 0);
+	public AuthLimitedVM() {
+		this.id = new SimpleIntegerProperty(null, "id", 0);
 		title = new SimpleStringProperty(null, "title", "");
 		category = new SimpleStringProperty(null, "category");
-		userName = new SimpleStringProperty(null, "userName", "");
-		password = new SimpleStringProperty(null, "password", "");
 		webUrl = new SimpleStringProperty(null, "webUrl", "");
 		description = new SimpleStringProperty(null, "description", "");
 		validFrom = new SimpleObjectProperty<>(null, "validFrom", LocalDate.now());
 	}
 
-	public AuthenticationVM(int id, String title, String category, String userName, String password, String webUrl,
-			String description, LocalDate validFrom) {
+	public AuthLimitedVM(int id, String title, String category, String webUrl, String description, LocalDate validFrom,
+			String color) {
+		super();
+
 		this.id = new SimpleIntegerProperty(null, "id", id);
 		this.title = new SimpleStringProperty(null, "title", title);
 		this.category = new SimpleStringProperty(null, "category", category);
-		this.userName = new SimpleStringProperty(null, "userName", userName);
-		this.password = new SimpleStringProperty(null, "password", password);
 		this.webUrl = new SimpleStringProperty(null, "webUrl", webUrl);
 		this.description = new SimpleStringProperty(null, "description", description);
 		this.validFrom = new SimpleObjectProperty<>(null, "validFrom", validFrom);
+		this.color = new SimpleStringProperty(null, "color", color);
 	}
 
 	@Override
@@ -72,13 +53,8 @@ public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
 		super.validate();
 	}
 
-	
 	public IntegerProperty getId() {
 		return id;
-	}
-
-	public void setId(IntegerProperty id) {
-		this.id = id;
 	}
 
 	public StringProperty getTitle() {
@@ -95,22 +71,6 @@ public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
 
 	public void setCategory(StringProperty category) {
 		this.category = category;
-	}
-
-	public StringProperty getUserName() {
-		return userName;
-	}
-
-	public void setUserName(StringProperty userName) {
-		this.userName = userName;
-	}
-
-	public StringProperty getPassword() {
-		return password;
-	}
-
-	public void setPassword(StringProperty password) {
-		this.password = password;
 	}
 
 	public StringProperty getWebUrl() {
@@ -137,4 +97,16 @@ public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
 		this.validFrom = validFrom;
 	}
 
+	public StringProperty getCategColor() {
+		return color;
+	}
+
+	public IntegerProperty getNumberOfDays() {
+		if (validFrom.getValue() == null) {
+			return new SimpleIntegerProperty(0);
+		} else {
+			Period p = Period.between(validFrom.getValue(), LocalDate.now());
+			return new SimpleIntegerProperty(p.getDays());
+		}
+	}
 }

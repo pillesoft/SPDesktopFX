@@ -6,6 +6,7 @@
 package com.ibh.spdesktop.dal;
 
 import java.util.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.FXCollections;
@@ -13,20 +14,22 @@ import javafx.collections.ObservableList;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import com.ibh.spdesktop.viewmodel.AuthLimitedVM;
+
 /**
  *
  * @author ihorvath
  */
 public class AuthenticationRepository extends BaseRepository<Authentication> {
 
-  public ObservableList<AuthLimited> getAuthLimited() {
+  public ObservableList<AuthLimitedVM> getAuthLimited() {
     
     EntityManager em = DbContext.getEM();
-    List<AuthLimited> ret;
+    List<AuthLimitedVM> ret;
     
     try {
       em.getTransaction().begin();
-      Query q = em.createNamedQuery("getAuthLimited", AuthLimited.class);
+      Query q = em.createNamedQuery("getAuthLimited", AuthLimitedVM.class);
       ret = q.getResultList();
       em.getTransaction().commit();
     } catch (Exception exc) {
@@ -37,7 +40,7 @@ public class AuthenticationRepository extends BaseRepository<Authentication> {
       }
     }
 
-    ArrayList<AuthLimited> listal = new ArrayList<>();
+    ArrayList<AuthLimitedVM> listal = new ArrayList<>();
     
     for (Object r : ret) {
       Object[] row = (Object[])r;
@@ -51,12 +54,12 @@ public class AuthenticationRepository extends BaseRepository<Authentication> {
         descr = row[4].toString();
       }
       
-      Date d = null;
+      LocalDate d = null;
       if (row[3] != null) {
-        d = (Date)row[3];
+        d = (LocalDate)row[3];
       }
       
-      AuthLimited al = new AuthLimited(Integer.decode(row[5].toString()), row[1].toString(), row[0].toString(), webaddr, d, descr, row[6].toString());
+      AuthLimitedVM al = new AuthLimitedVM(Integer.decode(row[5].toString()), row[0].toString(), row[1].toString(), webaddr, descr, d, row[6].toString());
       listal.add(al);
     }
     

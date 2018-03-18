@@ -79,7 +79,7 @@
                   <Label text="Valid From" GridPane.rowIndex="5" />
                   <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnSpan="2" GridPane.rowIndex="7">
                      <children>
-                        <Button defaultButton="true" mnemonicParsing="false" onAction="#handleSave" text="Save" />
+                        <Button fx:id="cmdSave" defaultButton="true" mnemonicParsing="false" onAction="#handleSave" text="Save" />
                         <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
                      </children>
                      <GridPane.margin>

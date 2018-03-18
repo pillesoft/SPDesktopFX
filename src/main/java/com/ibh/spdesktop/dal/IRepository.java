@@ -12,7 +12,7 @@ public interface IRepository<T> {
   
   T add(T obj);
   void update(T obj);
-  void delete(T obj);
+  void delete(int id);
   T getById(int id);
 
   List getList(String queryexpr, Map<String, Object> parameters);

@@ -11,6 +11,8 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.paint.Color;
+
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -21,8 +23,8 @@ import javax.validation.constraints.Size;
 public class CategoryVM extends BaseViewModel<CategoryVM> {
 
   private IntegerProperty id;
-  @NotNull
-  @Size(max = 100)
+  @NotEmpty(message = "Category Name is obligatory")
+  @Size(min=3, message = "Too short. Minimum length is 3 characters")
   private StringProperty name;
   private StringProperty color;
 
@@ -64,6 +66,10 @@ public class CategoryVM extends BaseViewModel<CategoryVM> {
 
   public Color getRGBColor() {
     return Color.valueOf(color.get());
+  }
+  
+  public String getCSSColor() {
+	  return "#" + color.get().substring(2);
   }
 
   @Override

@@ -6,12 +6,14 @@ import com.ibh.spdesktop.message.ActionMessage;
 import com.ibh.spdesktop.message.CrudMessage;
 import com.ibh.spdesktop.message.BaseMessage;
 import com.ibh.spdesktop.message.MessageService;
+import com.ibh.spdesktop.message.RefreshDataMessage;
 import com.ibh.spdesktop.validation.ValidationException;
 import com.ibh.spdesktop.viewmodel.CategoryVM;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
@@ -25,116 +27,117 @@ import org.slf4j.LoggerFactory;
  */
 public class CategoryCRUDViewController extends BaseController<CategoryVM> implements Initializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CategoryCRUDViewController.class);
-  private Category instance;
-  private CategoryVM vm;
+	private static final Logger LOG = LoggerFactory.getLogger(CategoryCRUDViewController.class);
+	private Category instance;
+	private CategoryVM vm;
 
-  @FXML
-  private TextField txtName;
-  @FXML
-  private ColorPicker cpColor;
+	@FXML
+	private Button cmdSave;
+	@FXML
+	private TextField txtName;
+	@FXML
+	private ColorPicker cpColor;
 
-  @FXML
-  public void handleSave() {
+	@FXML
+	public void handleSave() {
 
-    setControlStateNormal();
+		setControlStateNormal();
 
-    try {
-      vm.validateModel();
+		try {
+			vm.validateModel();
 
-      CrudMessage msg = (CrudMessage) getMessage();
-      switch (msg.getCrud()) {
-        case New:
-          instance = fromVMToEntity();
-          getBl().getCategRepos().add(instance);
-        case Update:
-        	instance = fromVMToEntity();
-        	getBl().getCategRepos().update(instance);
-          break;
-        case Delete:
-          break;
-        default:
-          throw new AssertionError(msg.getCrud().name());
+			CrudMessage msg = (CrudMessage) getMessage();
+			switch (msg.getCrud()) {
+			case New:
+				instance = fromVMToEntity();
+				getBl().getCategRepos().add(instance);
+				break;
+			case View:
+			case Update:
+				instance = fromVMToEntity();
+				getBl().getCategRepos().update(instance);
+				break;
+			case Delete:
+				instance = fromVMToEntity();
+				getBl().getCategRepos().delete(instance.getId());
+				break;
+			default:
+				throw new AssertionError(msg.getCrud().name());
 
-      }
+			}
 
-      MessageService.send(ActionMessage.class, new ActionMessage(ViewEnum.CategoryListView));
-    } catch (ValidationException exc) {
-      setControlStateError(exc);
-    }
+			MessageService.send(RefreshDataMessage.class, new RefreshDataMessage(ViewEnum.CategoryListView));
+		} catch (ValidationException exc) {
+			setControlStateError(exc);
+		}
 
-  }
+	}
 
-  @FXML
-  public void handleCancel() {
-    MessageService.send(ActionMessage.class, new ActionMessage(ViewEnum.CategoryListView));
-  }
+	@FXML
+	public void handleCancel() {
+		MessageService.send(RefreshDataMessage.class, new RefreshDataMessage(ViewEnum.CategoryListView));
+	}
 
-  public CategoryCRUDViewController(BusinessLogic bl) {
-    super(bl);
-  }
+	public CategoryCRUDViewController(BusinessLogic bl) {
+		super(bl);
+	}
 
-  /**
-   * Initializes the controller class.
-   */
-  @Override
-  public void initialize(URL url, ResourceBundle rb) {
-    setUpValidators();
-  }
+	/**
+	 * Initializes the controller class.
+	 */
+	@Override
+	public void initialize(URL url, ResourceBundle rb) {
+		// the message type is CrudMessage
+		CrudMessage msg = (CrudMessage) getMessage();
+		switch (msg.getCrud()) {
+		case View:
+		case Update:
+			vm = fromEntityToVM(getBl().getCategRepos().getById(msg.getId()));
+			break;
+		case New:
+			vm = new CategoryVM();
+			break;
+		case Delete:
+			vm = fromEntityToVM(getBl().getCategRepos().getById(msg.getId()));
+			txtName.setEditable(false);
+			cpColor.setDisable(true);
+			cmdSave.setText("Delete");
+			break;
+		default:
+			break;
+		}
 
-  @Override
-  protected void setMessage(BaseMessage message) {
-    super.setMessage(message);
+		setUpValidators();
+	}
 
-    // the message type is CrudMessage
-    CrudMessage msg = (CrudMessage) message;
-    switch (msg.getCrud()) {
-      case New:
-//        setInstance(new Authentication());
-        vm = new CategoryVM();
+	public Category getInstance() {
+		return instance;
+	}
 
-        break;
-      case Update:
-    	  vm = fromEntityToVM(getBl().getCategRepos().getById(msg.getId()));
-//        setInstance(getBl().getAuthRepos().getById(msg.getAuthID()));
-        break;
-      case Delete:
-//        setInstance(getBl().getAuthRepos().getById(msg.getAuthID()));
-        break;
-      default:
-        break;
-    }
+	public void setInstance(Category instance) {
+		this.instance = instance;
+	}
 
-  }
+	@Override
+	public void setUpValidators() {
+		try {
+			setUpValidator(txtName, vm.getName());
 
-  public Category getInstance() {
-    return instance;
-  }
+			cpColor.setValue(vm.getRGBColor());
 
-  public void setInstance(Category instance) {
-    this.instance = instance;
-  }
+			setControlStateNormal();
+		} catch (Exception ex) {
+			LOG.error(ex.getMessage(), ex);
+		}
+	}
 
-  @Override
-  public void setUpValidators() {
-    try {
-      setUpValidator(txtName, vm.getName());
+	private CategoryVM fromEntityToVM(Category c) {
+		return new CategoryVM(c.getId(), c.getName(), c.getColor());
+	}
 
-      cpColor.setValue(vm.getRGBColor());
-      
-      setControlStateNormal();
-    } catch (Exception ex) {
-      LOG.error(ex.getMessage(), ex);
-    }
-  }
-
-  private CategoryVM fromEntityToVM(Category c) {
-    return new CategoryVM(c.getId(), c.getName(), c.getColor());
-  }
-
-  private Category fromVMToEntity() {
-    Color c = cpColor.getValue();
-    return new Category(vm.getId().get(), vm.getName().get(), c.toString());
-  }
+	private Category fromVMToEntity() {
+		Color c = cpColor.getValue();
+		return new Category(vm.getId().get(), vm.getName().get(), c.toString());
+	}
 
 }

@@ -46,7 +46,12 @@ import org.slf4j.LoggerFactory;
 })
 public class Authentication implements Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(Authentication.class);
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+private static final Logger LOG = LoggerFactory.getLogger(Authentication.class);
   
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -78,7 +83,7 @@ public class Authentication implements Serializable {
   @Column(name = "VALIDFROM")
   private LocalDate validfrom;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne()
 //  @JoinColumn(name = "CATEGORY_ID", nullable = false, referencedColumnName = "ID", foreignKey = @ForeignKey(name = "CATEGORY_ID_FK"))
   @JoinColumn(name = "CATEGORY_ID", nullable = false)
 //  @NotNull
@@ -90,9 +95,9 @@ public class Authentication implements Serializable {
   @OneToMany(targetEntity = AuthPwdHistory.class, cascade = CascadeType.ALL, mappedBy = "authentication")
   private List<AuthPwdHistory> histories;
   
-  @Transient
+//  @Transient
 //  @Size(max = 50)
-  private String pwdclear;
+//  private String pwdclear;
   
 //  @Transient
 //  private boolean ispwdchanged;
@@ -126,40 +131,40 @@ public class Authentication implements Serializable {
 //    return errors.isEmpty();
 //  }
 
-  @PrePersist
-  @PreUpdate
-	public void prePersistUpdate() {
-		System.out.println("Listening Auth Pre Persist : " + getPassword());
-		System.out.println("Listening Auth Pre Persist : " + getPwdclear());
-    try {
-        // if there is no error on this field, encrypt the pwd
-        password = Crypt.encrypt(pwdclear.getBytes(StandardCharsets.UTF_8));
-      } catch (InvalidKeyException ex) {
-        LOG.error("encrypt error", ex);
-      } catch (InvalidAlgorithmParameterException ex) {
-        LOG.error("encrypt error", ex);
-      } catch (NoSuchAlgorithmException ex) {
-        LOG.error("encrypt error", ex);
-      }
-		System.out.println("Listening Auth Pre Persist : " + getPassword());
-		System.out.println("Listening Auth Pre Persist : " + getPwdclear());
-	}
-
-  @PostLoad
-	public void postLoad() {
-		System.out.println("Listening Auth Post Load : " + getPassword());
-		System.out.println("Listening Auth Post Load : " + getPwdclear());
-      try {
-        // if there is no error on this field, encrypt the pwd
-        pwdclear = new String(Crypt.decrypt(password));
-      } catch (InvalidKeyException ex) {
-        LOG.error("encrypt error", ex);
-      } catch (InvalidAlgorithmParameterException ex) {
-        LOG.error("encrypt error", ex);
-      }
-		System.out.println("Listening Auth Post Load : " + getPassword());
-		System.out.println("Listening Auth Post Load : " + getPwdclear());
-	}
+//  @PrePersist
+//  @PreUpdate
+//	public void prePersistUpdate() {
+//		System.out.println("Listening Auth Pre Persist : " + getPassword());
+//		System.out.println("Listening Auth Pre Persist : " + getPwdclear());
+//    try {
+//        // if there is no error on this field, encrypt the pwd
+//        password = Crypt.encrypt(pwdclear.getBytes(StandardCharsets.UTF_8));
+//      } catch (InvalidKeyException ex) {
+//        LOG.error("encrypt error", ex);
+//      } catch (InvalidAlgorithmParameterException ex) {
+//        LOG.error("encrypt error", ex);
+//      } catch (NoSuchAlgorithmException ex) {
+//        LOG.error("encrypt error", ex);
+//      }
+//		System.out.println("Listening Auth Pre Persist : " + getPassword());
+//		System.out.println("Listening Auth Pre Persist : " + getPwdclear());
+//	}
+//
+//  @PostLoad
+//	public void postLoad() {
+//		System.out.println("Listening Auth Post Load : " + getPassword());
+//		System.out.println("Listening Auth Post Load : " + getPwdclear());
+//      try {
+//        // if there is no error on this field, encrypt the pwd
+//        pwdclear = new String(Crypt.decrypt(password));
+//      } catch (InvalidKeyException ex) {
+//        LOG.error("encrypt error", ex);
+//      } catch (InvalidAlgorithmParameterException ex) {
+//        LOG.error("encrypt error", ex);
+//      }
+//		System.out.println("Listening Auth Post Load : " + getPassword());
+//		System.out.println("Listening Auth Post Load : " + getPwdclear());
+//	}
   
   public String getTitle() {
     return title;
@@ -275,45 +280,45 @@ public class Authentication implements Serializable {
 //    setCategname(category.getName());
   }
 
-  public String getPwdclear() {
-    return pwdclear;
-  }
-
-  public void setPwdclear(String pwdclear) {
-    
-    String old = this.pwdclear;
-    this.pwdclear = pwdclear.trim();
-//    Set<ConstraintViolation<Authentication>> err = validator.validateProperty(this, "pwdclear");
-//    if (err.size() > 0) {
-//      errors.put("pwdclear", err);
-//    } else {
-//      errors.remove("pwdclear");
-//      try {
-//        // if there is no error on this field, encrypt the pwd
-//        password = Crypt.encrypt(pwdclear.getBytes(StandardCharsets.UTF_8));
-//      } catch (InvalidKeyException ex) {
-//        logger.error("encrypt error", ex);
-//      } catch (InvalidAlgorithmParameterException ex) {
-//        logger.error("encrypt error", ex);
-//      } catch (NoSuchAlgorithmException ex) {
-//        logger.error("encrypt error", ex);
-//      }
-//      catch (Exception ex) {
-//        logger.error("encrypt error", ex);
-//      }
-//    }
-//    
-//    // find out if pwd is changed
-//    ispwdchanged = false;
-//    if (old == null && this.pwdclear != null && !this.pwdclear.isEmpty()) {
-//      ispwdchanged = true;
-//    }
-//    if (old != null && !old.equals(this.pwdclear)) {
-//      ispwdchanged = true;
-//    }
+//  public String getPwdclear() {
+//    return pwdclear;
+//  }
 //
-//    changeSupport.firePropertyChange("pwdclear", old, pwdclear);
-  }
+//  public void setPwdclear(String pwdclear) {
+//    
+//    String old = this.pwdclear;
+//    this.pwdclear = pwdclear.trim();
+////    Set<ConstraintViolation<Authentication>> err = validator.validateProperty(this, "pwdclear");
+////    if (err.size() > 0) {
+////      errors.put("pwdclear", err);
+////    } else {
+////      errors.remove("pwdclear");
+////      try {
+////        // if there is no error on this field, encrypt the pwd
+////        password = Crypt.encrypt(pwdclear.getBytes(StandardCharsets.UTF_8));
+////      } catch (InvalidKeyException ex) {
+////        logger.error("encrypt error", ex);
+////      } catch (InvalidAlgorithmParameterException ex) {
+////        logger.error("encrypt error", ex);
+////      } catch (NoSuchAlgorithmException ex) {
+////        logger.error("encrypt error", ex);
+////      }
+////      catch (Exception ex) {
+////        logger.error("encrypt error", ex);
+////      }
+////    }
+////    
+////    // find out if pwd is changed
+////    ispwdchanged = false;
+////    if (old == null && this.pwdclear != null && !this.pwdclear.isEmpty()) {
+////      ispwdchanged = true;
+////    }
+////    if (old != null && !old.equals(this.pwdclear)) {
+////      ispwdchanged = true;
+////    }
+////
+////    changeSupport.firePropertyChange("pwdclear", old, pwdclear);
+//  }
 
 //  public void setPwdClearInit() {
 //    ispwdchanged = false;

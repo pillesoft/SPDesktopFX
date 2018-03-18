@@ -5,187 +5,262 @@
  */
 package com.ibh.spdesktop.gui;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import com.ibh.spdesktop.bl.BusinessLogic;
-import com.ibh.spdesktop.dal.AuthLimited;
 import com.ibh.spdesktop.message.CrudMessage;
 import com.ibh.spdesktop.message.MessageService;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.ibh.spdesktop.message.RefreshDataMessage;
+import com.ibh.spdesktop.viewmodel.AuthLimitedVM;
+
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 
 /**
  * FXML Controller class
  *
  * @author ihorvath
  */
-public class AuthListViewController extends BaseController implements Initializable {
+public class AuthListViewController extends BaseController<AuthLimitedVM> implements Initializable {
 
-  @FXML
-  private TableView<AuthLimited> authTable;
-  @FXML
-  private TableColumn<AuthLimited, String> categoryColumn;
-  @FXML
-  private TableColumn<AuthLimited, String> titleColumn;
+	@FXML
+	private TableView<AuthLimitedVM> authTable;
+	@FXML
+	private TableColumn<AuthLimitedVM, String> categoryColumn;
+	@FXML
+	private TableColumn<AuthLimitedVM, String> titleColumn;
+	@FXML
+	private TableColumn<AuthLimitedVM, Integer> howOldColumn;
 
-  @FXML
-  private TextField categoryFilter;
-  @FXML
-  private TextField titleFilter;
+	@FXML
+	private TextField categoryFilter;
+	@FXML
+	private TextField titleFilter;
 
-  @FXML
-  private Label categoryLabel;
-  @FXML
-  private Label titleLabel;
-  @FXML
-  private Hyperlink webAddressLabel;
-  @FXML
-  private Label howOldLabel;
-  @FXML
-  private TextArea descriptionLabel;
+	@FXML
+	private VBox crudContainer;
 
-  private ObservableList<AuthLimited> data;
-  private FilteredList<AuthLimited> filteredData;
-  private AuthLimited currentData = null;
+	// @FXML
+	// private Label categoryLabel;
+	// @FXML
+	// private Label titleLabel;
+	// @FXML
+	// private Hyperlink webAddressLabel;
+	// @FXML
+	// private Label howOldLabel;
+	// @FXML
+	// private TextArea descriptionLabel;
 
-  public AuthListViewController(BusinessLogic bl) {
-    super(bl);
-  }
+	private ObservableList<AuthLimitedVM> data;
+	private FilteredList<AuthLimitedVM> filteredData;
+	private AuthLimitedVM currentData = null;
 
-  /**
-   * Initializes the controller class.
-   */
-  @Override
-  public void initialize(URL url, ResourceBundle rb) {
+	public AuthListViewController(BusinessLogic bl) {
+		super(bl);
+	}
 
-    data = getBl().getAuthRepos().getAuthLimited();
+	/**
+	 * Initializes the controller class.
+	 */
+	@Override
+	public void initialize(URL url, ResourceBundle rb) {
 
-    categoryColumn.setCellValueFactory(cellData -> cellData.getValue().getCategory());
-    titleColumn.setCellValueFactory(cellData -> cellData.getValue().getTitle());
+		MessageService.register(RefreshDataMessage.class, (arg) -> {
+			reloadData();
+		});
 
-    authTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldvalue, newvalue) -> {
-      currentData = newvalue;
-      showDetails();
-    }));
+		categoryColumn.setCellValueFactory(cellData -> cellData.getValue().getCategory());
+		titleColumn.setCellValueFactory(cellData -> cellData.getValue().getTitle());
+		howOldColumn.setCellValueFactory(cellData -> cellData.getValue().getNumberOfDays().asObject());
+//		howOldColumn.setCellValueFactory(new PropertyValueFactory<AuthLimitedVM, Integer>("numberOfDays"));
+//		howOldColumn
+//				.setCellFactory(new Callback<TableColumn<AuthLimitedVM, Integer>, TableCell<AuthLimitedVM, Integer>>() {
+//
+//					@Override
+//					public TableCell<AuthLimitedVM, Integer> call(TableColumn<AuthLimitedVM, Integer> param) {
+//						return new TableCell<AuthLimitedVM, Integer>() {
+//							@Override
+//							protected void updateItem(Integer howold, boolean empty) {
+//								super.updateItem(howold, empty);
+//								if (empty) {
+//									setText(null);
+//								} else {
+//									setText(Integer.toString(howold));
+//								}
+//							}
+//						};
+//					}
+//				});
+		// howOldColumn.setCellFactory(new Callback<TableColumn<AuthLimitedVM, Integer>,
+		// TableCell<AuthLimitedVM, Integer>>() {
+		// @Override
+		// public TableCell<AuthLimitedVM, Integer> call(TableColumn<AuthLimitedVM,
+		// Integer> col) {
+		// return new TableCell<AuthLimitedVM, Integer>() {
+		// @Override
+		// protected void updateItem(Integer howold, boolean empty) {
+		// super.updateItem(howold, empty);
+		// if (empty) {
+		// setText(null);
+		// } else {
+		// setText(Integer.toString(howold));
+		// }
+		// }
+		// };
+		// }
+		// });
 
-    filteredData = new FilteredList<>(data, p -> true);
+		authTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldvalue, newvalue) -> {
+			currentData = newvalue;
+			showDetails();
+		}));
 
-    categoryFilter.textProperty().addListener((observable, oldValue, newValue) -> {
-      doFilter();
-    });
+		categoryFilter.textProperty().addListener((observable, oldValue, newValue) -> {
+			doFilter();
+		});
 
-    titleFilter.textProperty().addListener((obs, oldv, newv) -> {
-      doFilter();
-    });
+		titleFilter.textProperty().addListener((obs, oldv, newv) -> {
+			doFilter();
+		});
 
-    SortedList<AuthLimited> sortedData = new SortedList<>(filteredData);
-    sortedData.comparatorProperty().bind(authTable.comparatorProperty());
+		reloadData();
+	}
 
-    authTable.setItems(sortedData);
-    if (!sortedData.isEmpty()) {
-      currentData = sortedData.get(0);
-    }
+	private void reloadData() {
+		List<AuthLimitedVM> vmlist = new ArrayList<>();
+		// getBl().getAuthRepos().getAuthLimited().forEach(c -> vmlist.add(from(c)));
 
-    showDetails();
+		// data = FXCollections.observableArrayList(vmlist);
+		data = getBl().getAuthRepos().getAuthLimited();
 
-  }
+		filteredData = new FilteredList<>(data, p -> true);
 
-  private void showDetails() {
-    if (currentData != null) {
-      categoryLabel.setText(currentData.getCategory().getValue());
-      titleLabel.setText(currentData.getTitle().getValue());
-      webAddressLabel.setText(currentData.getWebAddress().getValue());
-      howOldLabel.setText(Integer.toString(currentData.getNumberOfDays().getValue()));
-      descriptionLabel.setText(currentData.getDescription().getValue());
-    } else {
-      categoryLabel.setText("");
-      titleLabel.setText("");
-      webAddressLabel.setText("");
-      howOldLabel.setText("");
-      descriptionLabel.setText("");
-    }
-  }
+		SortedList<AuthLimitedVM> sortedData = new SortedList<>(filteredData);
+		sortedData.comparatorProperty().bind(authTable.comparatorProperty());
 
-  @FXML
-  public void handleNew() {
-    MessageService.send(CrudMessage.class, new CrudMessage(ViewEnum.AuthCRUDView, 0, CRUDEnum.New));
-  }
+		authTable.setItems(sortedData);
+		if (!sortedData.isEmpty()) {
+			currentData = sortedData.get(0);
+		}
 
-  @FXML
-  public void handleEdit() {
-    MessageService.send(CrudMessage.class, new CrudMessage(ViewEnum.AuthCRUDView, currentData.getId(), CRUDEnum.Update));
-  }
+		showDetails();
 
-  @FXML
-  public void handleDelete() {
-    MessageService.send(CrudMessage.class, new CrudMessage(ViewEnum.AuthCRUDView, currentData.getId(), CRUDEnum.Delete));
-  }
+	}
 
-  @FXML
-  public void handleClearFilter() {
-    categoryFilter.clear();
-    titleFilter.clear();
-    filteredData.setPredicate(a -> true);
-  }
+	// private AuthLimitedVM from(AuthLimited inst) {
+	// return new AuthLimitedVM(inst.getId(), inst.getTitle(), inst.getCategory(),
+	// inst.getWebAddress(), inst.getDescription(), inst.getValidFrom(),
+	// inst.getCategColor());
+	// }
 
-  @FXML
-  public void handleViewAuth() {
+	private void showDetails() {
 
-  }
+		if (currentData != null) {
+			setUIContent(crudContainer,
+					new CrudMessage(ViewEnum.AuthCRUDView, currentData.getId().get(), CRUDEnum.View));
+		}
+		/*
+		 * if (currentData != null) {
+		 * categoryLabel.setText(currentData.getCategory().getValue());
+		 * titleLabel.setText(currentData.getTitle().getValue());
+		 * webAddressLabel.setText(currentData.getWebAddress().getValue());
+		 * howOldLabel.setText(Integer.toString(currentData.getNumberOfDays().getValue()
+		 * )); descriptionLabel.setText(currentData.getDescription().getValue()); } else
+		 * { categoryLabel.setText(""); titleLabel.setText("");
+		 * webAddressLabel.setText(""); howOldLabel.setText("");
+		 * descriptionLabel.setText(""); }
+		 */
+	}
 
-  @FXML
-  public void handleWebAddressLink() {
-    String command = String.format("start %s %s", "firefox", webAddressLabel.getText());
-    try {
-      Runtime.getRuntime().exec(new String[]{"cmd", "/c", command});
-      // this is linux
-      //Runtime.getRuntime().exec(new String[] { "chromium-browser", "http://example.com/" });
-    } catch (IOException ex) {
-      Logger.getLogger(AuthListViewController.class.getName()).log(Level.SEVERE, null, ex);
-    }
-  }
+	@FXML
+	public void handleNew() {
+		setUIContent(crudContainer,
+				new CrudMessage(ViewEnum.AuthCRUDView, 0, CRUDEnum.New));
+//		MessageService.send(CrudMessage.class, new CrudMessage(ViewEnum.AuthCRUDView, 0, CRUDEnum.New));
+	}
 
-  private void doFilter() {
-    String cfilter = categoryFilter.getText();
-    String tfilter = titleFilter.getText();
+	// @FXML
+	// public void handleEdit() {
+	// MessageService.send(CrudMessage.class,
+	// new CrudMessage(ViewEnum.AuthCRUDView, currentData.getId(),
+	// CRUDEnum.Update));
+	// }
+	//
+	// @FXML
+	// public void handleDelete() {
+	// MessageService.send(CrudMessage.class,
+	// new CrudMessage(ViewEnum.AuthCRUDView, currentData.getId(),
+	// CRUDEnum.Delete));
+	// }
 
-    filteredData.setPredicate(a -> {
+	@FXML
+	public void handleClearFilter() {
+		categoryFilter.clear();
+		titleFilter.clear();
+		filteredData.setPredicate(a -> true);
+	}
 
-      String lowercFilter = cfilter.toLowerCase();
-      String lowertFilter = tfilter.toLowerCase();
-      // none of empty
-      if (((cfilter != null && !cfilter.isEmpty()) && a.getCategory().getValue().toLowerCase().contains(lowercFilter))
-              && ((tfilter != null && !tfilter.isEmpty()) && a.getTitle().getValue().toLowerCase().contains(lowertFilter))) {
-        return true;
-      } else if (((cfilter != null && !cfilter.isEmpty()) && a.getCategory().getValue().toLowerCase().contains(lowercFilter))
-              && (tfilter == null || tfilter.isEmpty())) {
-        // title is empty
-        return true;
-      } else if ((cfilter == null || cfilter.isEmpty())
-              && ((tfilter != null && !tfilter.isEmpty()) && a.getTitle().getValue().toLowerCase().contains(lowertFilter))) {
-        // category is empty
-        return true;
-      }
-      return false;
-    }
-    );
+	@FXML
+	public void handleViewAuth() {
 
-  }
+	}
 
-  @Override
-  public void setUpValidators() {
-    
-  }
+	// @FXML
+	// public void handleWebAddressLink() {
+	// String command = String.format("start %s %s", "firefox",
+	// webAddressLabel.getText());
+	// try {
+	// Runtime.getRuntime().exec(new String[] { "cmd", "/c", command });
+	// // this is linux
+	// // Runtime.getRuntime().exec(new String[] { "chromium-browser",
+	// // "http://example.com/" });
+	// } catch (IOException ex) {
+	// Logger.getLogger(AuthListViewController.class.getName()).log(Level.SEVERE,
+	// null, ex);
+	// }
+	// }
+
+	private void doFilter() {
+		String cfilter = categoryFilter.getText();
+		String tfilter = titleFilter.getText();
+
+		filteredData.setPredicate(a -> {
+
+			String lowercFilter = cfilter.toLowerCase();
+			String lowertFilter = tfilter.toLowerCase();
+			// none of empty
+			if (((cfilter != null && !cfilter.isEmpty())
+					&& a.getCategory().getValue().toLowerCase().contains(lowercFilter))
+					&& ((tfilter != null && !tfilter.isEmpty())
+							&& a.getTitle().getValue().toLowerCase().contains(lowertFilter))) {
+				return true;
+			} else if (((cfilter != null && !cfilter.isEmpty())
+					&& a.getCategory().getValue().toLowerCase().contains(lowercFilter))
+					&& (tfilter == null || tfilter.isEmpty())) {
+				// title is empty
+				return true;
+			} else if ((cfilter == null || cfilter.isEmpty()) && ((tfilter != null && !tfilter.isEmpty())
+					&& a.getTitle().getValue().toLowerCase().contains(lowertFilter))) {
+				// category is empty
+				return true;
+			}
+			return false;
+		});
+
+	}
+
+	@Override
+	public void setUpValidators() {
+
+	}
 }

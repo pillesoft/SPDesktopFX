@@ -7,7 +7,11 @@ package com.ibh.spdesktop.dal;
  */
 public class IBHDatabaseException extends RuntimeException {
 
-  private final DBException type;
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+private final DBException type;
   
   public enum DBException {
     AVAILABLE("The database is available"),
