@@ -137,12 +137,12 @@ public abstract class BaseRepository<T> implements IRepository<T> {
 	}
 
 	@Override
-	public List getList(String queryexpr) {
+	public List<?> getList(String queryexpr) {
 
 		EntityManager em = DbContext.getEM();
 		em.getTransaction().begin();
 		Query q;
-		List ret;
+		List<?> ret;
 		try {
 			q = em.createNativeQuery(queryexpr);
 			em.getTransaction().commit();
@@ -161,7 +161,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
 	}
 
 	@Override
-	public List getList(String queryexpr, Map<String, Object> parameters) {
+	public List<?> getList(String queryexpr, Map<String, Object> parameters) {
 		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
 																		// Tools | Templates.
 
@@ -187,7 +187,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
 	public List<T> getList() {
 		EntityManager em = DbContext.getEM();
 		em.getTransaction().begin();
-		List ret;
+		List<?> ret;
 
 		try {
 			String qname = String.format("get%sAll", getClassName());

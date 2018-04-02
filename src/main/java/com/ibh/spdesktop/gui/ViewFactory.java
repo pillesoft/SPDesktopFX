@@ -21,6 +21,7 @@ public final class ViewFactory {
     view.put(ViewEnum.Main, new View("Main.fxml", MainController.class));
     view.put(ViewEnum.Login, new View("Login.fxml", LoginController.class));
     view.put(ViewEnum.AuthListView, new View("AuthListView.fxml", AuthListViewController.class));
+    view.put(ViewEnum.AuthViewView, new View("AuthViewView.fxml", AuthViewViewController.class));
     view.put(ViewEnum.AuthCRUDView, new View("AuthCRUDView.fxml", AuthCRUDViewController.class));
     view.put(ViewEnum.CategoryListView, new View("CategoryListView.fxml", CategoryListViewController.class));
     view.put(ViewEnum.CategoryCRUDView, new View("CategoryCRUDView.fxml", CategoryCRUDViewController.class));

@@ -15,7 +15,7 @@ public interface IRepository<T> {
   void delete(int id);
   T getById(int id);
 
-  List getList(String queryexpr, Map<String, Object> parameters);
-  List getList(String queryexpr);
+  List<?> getList(String queryexpr, Map<String, Object> parameters);
+  List<?> getList(String queryexpr);
   List<T> getList();
 }

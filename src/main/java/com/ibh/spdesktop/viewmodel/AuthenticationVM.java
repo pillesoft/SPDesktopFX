@@ -1,6 +1,5 @@
 package com.ibh.spdesktop.viewmodel;
 
-import com.ibh.spdesktop.dal.Category;
 import com.ibh.spdesktop.validation.ValidationException;
 import java.time.LocalDate;
 
@@ -19,6 +18,8 @@ import javax.validation.constraints.Size;
  */
 public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
 
+	private final String origPassword;
+	
 	private IntegerProperty id;
 	
 	@NotNull
@@ -53,6 +54,8 @@ public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
 		webUrl = new SimpleStringProperty(null, "webUrl", "");
 		description = new SimpleStringProperty(null, "description", "");
 		validFrom = new SimpleObjectProperty<>(null, "validFrom", LocalDate.now());
+
+		this.origPassword = "";
 	}
 
 	public AuthenticationVM(int id, String title, String category, String userName, String password, String webUrl,
@@ -65,6 +68,8 @@ public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
 		this.webUrl = new SimpleStringProperty(null, "webUrl", webUrl);
 		this.description = new SimpleStringProperty(null, "description", description);
 		this.validFrom = new SimpleObjectProperty<>(null, "validFrom", validFrom);
+		
+		this.origPassword = password;
 	}
 
 	@Override
@@ -136,5 +141,15 @@ public class AuthenticationVM extends BaseViewModel<AuthenticationVM> {
 	public void setValidFrom(ObjectProperty<LocalDate> validFrom) {
 		this.validFrom = validFrom;
 	}
+
+	public String getOrigPassword() {
+		return origPassword;
+	}
+
+	public boolean isPwdChanged() {
+		return !origPassword.equals(this.password.get());
+	}
+
+	
 
 }

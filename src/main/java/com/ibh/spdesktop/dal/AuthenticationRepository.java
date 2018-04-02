@@ -5,16 +5,17 @@
  */
 package com.ibh.spdesktop.dal;
 
-import java.util.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import com.ibh.spdesktop.viewmodel.AuthLimitedVM;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  *
@@ -25,7 +26,7 @@ public class AuthenticationRepository extends BaseRepository<Authentication> {
   public ObservableList<AuthLimitedVM> getAuthLimited() {
     
     EntityManager em = DbContext.getEM();
-    List<AuthLimitedVM> ret;
+    List<?> ret;
     
     try {
       em.getTransaction().begin();
@@ -66,39 +67,10 @@ public class AuthenticationRepository extends BaseRepository<Authentication> {
     return FXCollections.observableList(listal);
   }
   
-  @Override
-  public Authentication getById(int id) {
-    Authentication a = super.getById(id);
-//    a.setPwdClearInit();
-    
-    return a;
-  }
-  
   public AuthInfo getAuthInfo(int id) {
     Authentication a = getById(id);
     AuthInfo ret = new AuthInfo(a.getId(), a.getUsername(), a.getPassword(), a.getTitle());
     return ret;
-  }
-
-  @Override
-  public void update(Authentication obj) throws IBHDbConstraintException {
-    Authentication old = getById(obj.getId());
-
-//    Session sess = DbContext.getSessionFactory().openSession();
-//    sess.beginTransaction();
-//    try {
-//      if (obj.getIsPwdChanged()) {
-//        // make pwdchnaged
-//        AuthPwdHistory hist = new AuthPwdHistory(obj, old.getPassword());
-//        sess.save(hist);
-//      }
-//      sess.merge(obj);
-//      sess.getTransaction().commit();
-//    } catch (ConstraintViolationException exc) {
-//      throw parseConstraintExc(exc);
-//    } finally {
-//      sess.close();
-//    }
   }
 
   @Override

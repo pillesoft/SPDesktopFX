@@ -1,18 +1,5 @@
 package com.ibh.spdesktop.gui;
 
-import com.ibh.spdesktop.bl.BusinessLogic;
-import com.ibh.spdesktop.bl.Crypt;
-import com.ibh.spdesktop.dal.Authentication;
-import com.ibh.spdesktop.dal.Category;
-import com.ibh.spdesktop.message.ActionMessage;
-import com.ibh.spdesktop.message.CrudMessage;
-import com.ibh.spdesktop.message.BaseMessage;
-import com.ibh.spdesktop.message.MessageService;
-import com.ibh.spdesktop.message.RefreshDataMessage;
-import com.ibh.spdesktop.validation.ValidationException;
-import com.ibh.spdesktop.viewmodel.AuthenticationVM;
-import com.ibh.spdesktop.viewmodel.CategoryVM;
-
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
@@ -21,6 +8,22 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.ibh.spdesktop.bl.BusinessLogic;
+import com.ibh.spdesktop.bl.Crypt;
+import com.ibh.spdesktop.dal.AuthPwdHistory;
+import com.ibh.spdesktop.dal.Authentication;
+import com.ibh.spdesktop.dal.Category;
+import com.ibh.spdesktop.message.ActionMessage;
+import com.ibh.spdesktop.message.CrudMessage;
+import com.ibh.spdesktop.message.MessageService;
+import com.ibh.spdesktop.message.RefreshDataMessage;
+import com.ibh.spdesktop.validation.ValidationException;
+import com.ibh.spdesktop.viewmodel.AuthenticationVM;
+
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -29,10 +32,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * FXML Controller class
@@ -81,6 +80,10 @@ public class AuthCRUDViewController extends BaseController<AuthenticationVM> imp
 			case Update:
 				instance = fromVMToEntity();
 				getBl().getAuthRepos().update(instance);
+
+				if (vm.isPwdChanged()) {
+					getBl().getAuthPwdRepos().add(new AuthPwdHistory(instance, instance.getPassword()));
+				}
 				break;
 			case Delete:
 				instance = fromVMToEntity();
@@ -167,8 +170,15 @@ public class AuthCRUDViewController extends BaseController<AuthenticationVM> imp
 	}
 
 	private AuthenticationVM fromEntityToVM(Authentication c) {
+		String clearpwd="";
+		try {
+			clearpwd = new String(Crypt.decrypt(c.getPassword()));
+		} catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
+			LOG.warn("encrypt error", e);
+		}
+		
 		return new AuthenticationVM(c.getId(), c.getTitle(), c.getCategory().getName(), c.getUsername(),
-				c.getPassword(), c.getWeburl(), c.getDescription(), c.getValidfrom());
+				clearpwd, c.getWeburl(), c.getDescription(), c.getValidfrom());
 	}
 
 	private Authentication fromVMToEntity() {

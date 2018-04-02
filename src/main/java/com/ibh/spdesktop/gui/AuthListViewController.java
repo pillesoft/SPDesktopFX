@@ -6,14 +6,13 @@
 package com.ibh.spdesktop.gui;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import com.ibh.spdesktop.bl.BusinessLogic;
 import com.ibh.spdesktop.message.CrudMessage;
 import com.ibh.spdesktop.message.MessageService;
 import com.ibh.spdesktop.message.RefreshDataMessage;
+import com.ibh.spdesktop.message.UIContentMessage;
 import com.ibh.spdesktop.viewmodel.AuthLimitedVM;
 
 import javafx.collections.ObservableList;
@@ -22,6 +21,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -50,17 +50,6 @@ public class AuthListViewController extends BaseController<AuthLimitedVM> implem
 	@FXML
 	private VBox crudContainer;
 
-	// @FXML
-	// private Label categoryLabel;
-	// @FXML
-	// private Label titleLabel;
-	// @FXML
-	// private Hyperlink webAddressLabel;
-	// @FXML
-	// private Label howOldLabel;
-	// @FXML
-	// private TextArea descriptionLabel;
-
 	private ObservableList<AuthLimitedVM> data;
 	private FilteredList<AuthLimitedVM> filteredData;
 	private AuthLimitedVM currentData = null;
@@ -77,6 +66,9 @@ public class AuthListViewController extends BaseController<AuthLimitedVM> implem
 
 		MessageService.register(RefreshDataMessage.class, (arg) -> {
 			reloadData();
+		});
+		MessageService.register(UIContentMessage.class, (arg) -> {
+			setContent((UIContentMessage)arg);
 		});
 
 		categoryColumn.setCellValueFactory(cellData -> cellData.getValue().getCategory());
@@ -133,11 +125,23 @@ public class AuthListViewController extends BaseController<AuthLimitedVM> implem
 			doFilter();
 		});
 
+		authTable.setRowFactory(tv -> new TableRow<AuthLimitedVM>() {
+			@Override
+			public void updateItem(AuthLimitedVM item, boolean empty) {
+				super.updateItem(item, empty);
+				if (item == null) {
+					setStyle("");
+				} else {
+					setStyle(String.format("-fx-background-color: %s;", item.getCSSColor()));
+				}
+			}
+		});
+		
 		reloadData();
 	}
 
 	private void reloadData() {
-		List<AuthLimitedVM> vmlist = new ArrayList<>();
+		//List<AuthLimitedVM> vmlist = new ArrayList<>();
 		// getBl().getAuthRepos().getAuthLimited().forEach(c -> vmlist.add(from(c)));
 
 		// data = FXCollections.observableArrayList(vmlist);
@@ -167,7 +171,7 @@ public class AuthListViewController extends BaseController<AuthLimitedVM> implem
 
 		if (currentData != null) {
 			setUIContent(crudContainer,
-					new CrudMessage(ViewEnum.AuthCRUDView, currentData.getId().get(), CRUDEnum.View));
+					new CrudMessage(ViewEnum.AuthViewView, currentData.getId().get(), CRUDEnum.View));
 		}
 		/*
 		 * if (currentData != null) {
@@ -189,6 +193,11 @@ public class AuthListViewController extends BaseController<AuthLimitedVM> implem
 //		MessageService.send(CrudMessage.class, new CrudMessage(ViewEnum.AuthCRUDView, 0, CRUDEnum.New));
 	}
 
+	private void setContent(UIContentMessage msg) {
+		setUIContent(crudContainer,
+				new CrudMessage(msg.getContent(), msg.getId(), msg.getCrud()));		
+	}
+	
 	// @FXML
 	// public void handleEdit() {
 	// MessageService.send(CrudMessage.class,
@@ -209,26 +218,6 @@ public class AuthListViewController extends BaseController<AuthLimitedVM> implem
 		titleFilter.clear();
 		filteredData.setPredicate(a -> true);
 	}
-
-	@FXML
-	public void handleViewAuth() {
-
-	}
-
-	// @FXML
-	// public void handleWebAddressLink() {
-	// String command = String.format("start %s %s", "firefox",
-	// webAddressLabel.getText());
-	// try {
-	// Runtime.getRuntime().exec(new String[] { "cmd", "/c", command });
-	// // this is linux
-	// // Runtime.getRuntime().exec(new String[] { "chromium-browser",
-	// // "http://example.com/" });
-	// } catch (IOException ex) {
-	// Logger.getLogger(AuthListViewController.class.getName()).log(Level.SEVERE,
-	// null, ex);
-	// }
-	// }
 
 	private void doFilter() {
 		String cfilter = categoryFilter.getText();

@@ -1,5 +1,6 @@
 package com.ibh.spdesktop.bl;
 
+import com.ibh.spdesktop.dal.AuthPwdHistoryRepository;
 import com.ibh.spdesktop.dal.AuthenticationRepository;
 import com.ibh.spdesktop.dal.CategoryRepository;
 import com.ibh.spdesktop.dal.DbContext;
@@ -23,6 +24,7 @@ public class BusinessLogic {
   
   private final CategoryRepository categRepos;
   private final AuthenticationRepository authRepos;
+  private final AuthPwdHistoryRepository authPwdRepos;
   private final SettingRepository settingRepos;
   private String loggedInName;
   
@@ -30,6 +32,7 @@ public class BusinessLogic {
     categRepos = new CategoryRepository();
     authRepos = new AuthenticationRepository();
     settingRepos = new SettingRepository();
+    authPwdRepos = new AuthPwdHistoryRepository();
   }
 
   public CategoryRepository getCategRepos() {
@@ -44,7 +47,11 @@ public class BusinessLogic {
     return settingRepos;
   }
   
-  public String getLoggedInName() {
+  public AuthPwdHistoryRepository getAuthPwdRepos() {
+	return authPwdRepos;
+}
+
+public String getLoggedInName() {
     return loggedInName;
   }
   

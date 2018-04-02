@@ -129,13 +129,13 @@ public final class Crypt {
     return xorbyte;
   }
 
-  private static void printByteArray(String prefix, byte[] arr) {
-    System.out.print(prefix + ":");
-    for (byte b : arr) {
-      System.out.print(b + " ");
-    }
-    System.out.println();
-  }
+//  private static void printByteArray(String prefix, byte[] arr) {
+//    System.out.print(prefix + ":");
+//    for (byte b : arr) {
+//      System.out.print(b + " ");
+//    }
+//    System.out.println();
+//  }
 
   private static byte[] transform(final int mode, final byte[] keyBytes, final byte[] ivBytes
           , final byte[] messageBytes) throws InvalidKeyException, InvalidAlgorithmParameterException {

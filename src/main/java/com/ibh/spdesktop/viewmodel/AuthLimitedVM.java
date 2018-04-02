@@ -109,4 +109,8 @@ public class AuthLimitedVM extends BaseViewModel<AuthLimitedVM> {
 			return new SimpleIntegerProperty(p.getDays());
 		}
 	}
+
+	public String getCSSColor() {
+		return "#" + color.get().substring(2);
+	}
 }
