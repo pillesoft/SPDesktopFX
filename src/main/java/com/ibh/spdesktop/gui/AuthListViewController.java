@@ -8,6 +8,8 @@ package com.ibh.spdesktop.gui;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.ibh.spdesktop.bl.BusinessLogic;
 import com.ibh.spdesktop.message.CrudMessage;
 import com.ibh.spdesktop.message.MessageService;
@@ -141,13 +143,37 @@ public class AuthListViewController extends BaseController<AuthLimitedVM> implem
 	}
 
 	private void reloadData() {
-		//List<AuthLimitedVM> vmlist = new ArrayList<>();
-		// getBl().getAuthRepos().getAuthLimited().forEach(c -> vmlist.add(from(c)));
 
-		// data = FXCollections.observableArrayList(vmlist);
 		data = getBl().getAuthRepos().getAuthLimited();
 
-		filteredData = new FilteredList<>(data, p -> true);
+		filteredData = new FilteredList<>(data, a -> {
+			String cfilter = categoryFilter.getText();
+			String tfilter = titleFilter.getText();
+			
+			String lowercFilter = cfilter.toLowerCase();
+			String lowertFilter = tfilter.toLowerCase();
+			if(StringUtils.isEmpty(cfilter) && StringUtils.isEmpty(tfilter)) {
+				//both are empty
+				return true;
+			} else if (((cfilter != null && !cfilter.isEmpty())
+					&& a.getCategory().getValue().toLowerCase().contains(lowercFilter))
+					&& ((tfilter != null && !tfilter.isEmpty())
+							&& a.getTitle().getValue().toLowerCase().contains(lowertFilter))) {
+				// none of empty
+				return true;
+			} else if (((cfilter != null && !cfilter.isEmpty())
+					&& a.getCategory().getValue().toLowerCase().contains(lowercFilter))
+					&& (tfilter == null || tfilter.isEmpty())) {
+				// title is empty
+				return true;
+			} else if ((cfilter == null || cfilter.isEmpty()) && ((tfilter != null && !tfilter.isEmpty())
+					&& a.getTitle().getValue().toLowerCase().contains(lowertFilter))) {
+				// category is empty
+				return true;
+			}
+			return false;
+			
+		});
 
 		SortedList<AuthLimitedVM> sortedData = new SortedList<>(filteredData);
 		sortedData.comparatorProperty().bind(authTable.comparatorProperty());
@@ -161,56 +187,24 @@ public class AuthListViewController extends BaseController<AuthLimitedVM> implem
 
 	}
 
-	// private AuthLimitedVM from(AuthLimited inst) {
-	// return new AuthLimitedVM(inst.getId(), inst.getTitle(), inst.getCategory(),
-	// inst.getWebAddress(), inst.getDescription(), inst.getValidFrom(),
-	// inst.getCategColor());
-	// }
-
 	private void showDetails() {
 
 		if (currentData != null) {
 			setUIContent(crudContainer,
 					new CrudMessage(ViewEnum.AuthViewView, currentData.getId().get(), CRUDEnum.View));
 		}
-		/*
-		 * if (currentData != null) {
-		 * categoryLabel.setText(currentData.getCategory().getValue());
-		 * titleLabel.setText(currentData.getTitle().getValue());
-		 * webAddressLabel.setText(currentData.getWebAddress().getValue());
-		 * howOldLabel.setText(Integer.toString(currentData.getNumberOfDays().getValue()
-		 * )); descriptionLabel.setText(currentData.getDescription().getValue()); } else
-		 * { categoryLabel.setText(""); titleLabel.setText("");
-		 * webAddressLabel.setText(""); howOldLabel.setText("");
-		 * descriptionLabel.setText(""); }
-		 */
 	}
 
 	@FXML
 	public void handleNew() {
 		setUIContent(crudContainer,
 				new CrudMessage(ViewEnum.AuthCRUDView, 0, CRUDEnum.New));
-//		MessageService.send(CrudMessage.class, new CrudMessage(ViewEnum.AuthCRUDView, 0, CRUDEnum.New));
 	}
 
 	private void setContent(UIContentMessage msg) {
 		setUIContent(crudContainer,
 				new CrudMessage(msg.getContent(), msg.getId(), msg.getCrud()));		
 	}
-	
-	// @FXML
-	// public void handleEdit() {
-	// MessageService.send(CrudMessage.class,
-	// new CrudMessage(ViewEnum.AuthCRUDView, currentData.getId(),
-	// CRUDEnum.Update));
-	// }
-	//
-	// @FXML
-	// public void handleDelete() {
-	// MessageService.send(CrudMessage.class,
-	// new CrudMessage(ViewEnum.AuthCRUDView, currentData.getId(),
-	// CRUDEnum.Delete));
-	// }
 
 	@FXML
 	public void handleClearFilter() {
